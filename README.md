@@ -45,4 +45,4 @@ If you have any feedback, please reach out to me at [:link:facebook](https://www
 
 
 ### Special Thanks 
-:black_heart::black_heart: Brad :black_heart::black_heart:
+:black_heart::black_heart: Brad Traversy :black_heart::black_heart:
