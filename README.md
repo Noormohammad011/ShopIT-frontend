@@ -34,7 +34,7 @@ start:Dev
 
 ```
 ### Demo
-Here you can see [:link:demo](https://shopit-menia.netlify.app/) [:link:backend](https://shopit-backend-production.up.railway.app/api/products) 
+Here you can see [:link:demo](https://shopit-menia.netlify.app/) [:link:backend](https://shy-cyan-squid-wear.cyclic.app/api/products)
 
 ### 🚀 About Me
 I'm a full stack developer & passionate to do my designation's responsibility and hungry to explore new technology.
