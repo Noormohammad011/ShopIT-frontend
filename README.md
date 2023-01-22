@@ -1,4 +1,4 @@
-# SHOP IT
+# SHOP IT Backend
 >eCommerce platform built with the MERN stack & Redux.
 
 ![Shop IT](https://raw.githubusercontent.com/Noormohammad011/react-portfolio/main/src/assets/img/projects/shopIt.png)
@@ -19,7 +19,7 @@
 
 ### Install Dependencies
 ```
-git clone 
+git clone url
 cd directory_name
 yarn i or npm i
 
@@ -28,9 +28,13 @@ yarn i or npm i
 ### Run
 ```
 npm run start
+
+development 
+start:Dev
+
 ```
 ### Demo
-Here you can see [:link:demo](https://shopit-menia.netlify.app/)
+Here you can see [:link:demo](https://shopit-menia.netlify.app/) [:link:backend](https://shopit-backend-production.up.railway.app/api/products) 
 
 ### 🚀 About Me
 I'm a full stack developer & passionate to do my designation's responsibility and hungry to explore new technology.
@@ -41,4 +45,4 @@ If you have any feedback, please reach out to me at [:link:facebook](https://www
 
 
 ### Special Thanks 
-:black_heart::black_heart: Brad :black_heart::black_heart:
+:black_heart::black_heart: Brad Traversy :black_heart::black_heart:
