@@ -4,12 +4,14 @@ import { PayPalButton } from 'react-paypal-button-v2'
 import { Link, useParams } from 'react-router-dom'
 import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap'
 import { useSelector, useDispatch } from 'react-redux'
+import StripeCheckout from 'react-stripe-checkout'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import {
   getOrderDetails,
   payOrder,
   deliverOrder,
+  payOrderStripe,
 } from '../actions/orderActions'
 import {
   ORDER_PAY_RESET,
@@ -22,6 +24,8 @@ const OrderScreen = ({ history }) => {
 
   const orderDetails = useSelector((state) => state.orderDetails)
   const { order, loading, error } = orderDetails
+  const cart = useSelector((state) => state.cart)
+  const { paymentMethod } = cart
   const orderPay = useSelector((state) => state.orderPay)
   const { loading: loadingPay, success: successPay } = orderPay
   const orderDeliver = useSelector((state) => state.orderDeliver)
@@ -44,35 +48,56 @@ const OrderScreen = ({ history }) => {
     if (!userInfo) {
       history.push('/login')
     }
-    const addPayPalScript = async () => {
-      const { data: clientId } = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/config/paypal`
-      )
-      const script = document.createElement('script')
-      script.type = 'text/javascript'
-      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`
-      script.async = true
-      script.onload = () => {
-        setSdkReady(true)
+    if (paymentMethod === 'PayPal') {
+      const addPayPalScript = async () => {
+        const { data: clientId } = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/config/paypal`
+        )
+        const script = document.createElement('script')
+        script.type = 'text/javascript'
+        script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`
+        script.async = true
+        script.onload = () => {
+          setSdkReady(true)
+        }
+        document.body.appendChild(script)
       }
-      document.body.appendChild(script)
-    }
-    if (!order || successPay || successDeliver || order._id !== id) {
-      dispatch({ type: ORDER_PAY_RESET })
-      dispatch({ type: ORDER_DELIVER_RESET })
-      dispatch(getOrderDetails(id))
-    } else if (!order.isPaid) {
-      if (!window.paypal) {
-        addPayPalScript()
-      } else {
-        setSdkReady(true)
+      if (!order || successPay || successDeliver || order._id !== id) {
+        dispatch({ type: ORDER_PAY_RESET })
+        dispatch({ type: ORDER_DELIVER_RESET })
+        dispatch(getOrderDetails(id))
+      } else if (!order.isPaid) {
+        if (!window.paypal) {
+          addPayPalScript()
+        } else {
+          setSdkReady(true)
+        }
+      }
+    } else {
+      if (!order || successPay || successDeliver || order._id !== id) {
+        dispatch({ type: ORDER_PAY_RESET })
+        dispatch({ type: ORDER_DELIVER_RESET })
+        dispatch(getOrderDetails(id))
       }
     }
-  }, [dispatch, id, successPay, successDeliver, order, userInfo, history])
+  }, [
+    dispatch,
+    id,
+    successPay,
+    successDeliver,
+    order,
+    userInfo,
+    history,
+    paymentMethod,
+  ])
 
   const successPaymentHandler = (paymentResult) => {
     dispatch(payOrder(id, paymentResult))
   }
+  const successPaymentHandlerStripe = (token) => {
+    dispatch(payOrderStripe(id, token, order.totalPrice))
+  }
+
   const deliverHandler = () => {
     dispatch(deliverOrder(order))
   }
@@ -186,19 +211,39 @@ const OrderScreen = ({ history }) => {
                   <Col>${order.totalPrice}</Col>
                 </Row>
               </ListGroup.Item>
-              {!order.isPaid && (
-                <ListGroup.Item>
-                  {loadingPay && <Loader />}
-                  {!sdkReady ? (
-                    <Loader />
-                  ) : (
-                    <PayPalButton
-                      amount={order.totalPrice}
-                      onSuccess={successPaymentHandler}
-                    />
-                  )}
-                </ListGroup.Item>
-              )}
+              {!order.isPaid &&
+                (paymentMethod === 'PayPal' ? (
+                  <ListGroup.Item>
+                    {loadingPay && <Loader />}
+                    {!sdkReady ? (
+                      <Loader />
+                    ) : (
+                      <PayPalButton
+                        amount={order.totalPrice}
+                        onSuccess={successPaymentHandler}
+                      />
+                    )}
+                  </ListGroup.Item>
+                ) : (
+                  <ListGroup.Item>
+                    {loadingPay && <Loader />}
+                    <StripeCheckout
+                      amount={order.totalPrice * 100}
+                      shippingAddress
+                      token={successPaymentHandlerStripe}
+                      stripeKey={process.env.REACT_APP_STRIPE_KEY}
+                      currency='USD'
+                    >
+                      <Button
+                        type='button'
+                        className='btn-block'
+                        
+                      >
+                         Pay Now
+                      </Button>
+                    </StripeCheckout>
+                  </ListGroup.Item>
+                ))}
               {loadingDeliver && <Loader />}
               {userInfo &&
                 userInfo.isAdmin &&
