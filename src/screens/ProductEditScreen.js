@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import FileBase from 'react-file-base64'
+import axios from 'axios'
 import { Form, Button } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import Message from '../components/Message'
@@ -18,12 +18,15 @@ const ProductEditScreen = ({ history, match }) => {
   const [category, setCategory] = useState('')
   const [countInStock, setCountInStock] = useState(0)
   const [description, setDescription] = useState('')
+  const [uploading, setUploading] = useState(false)
 
 
   const dispatch = useDispatch()
 
   const productDetails = useSelector((state) => state.productDetails)
   const { loading, error, product } = productDetails
+
+  console.log(product.image)
 
   const productUpdate = useSelector((state) => state.productUpdate)
   const {
@@ -37,7 +40,7 @@ const ProductEditScreen = ({ history, match }) => {
       dispatch({ type: PRODUCT_UPDATE_RESET })
       history.push('/admin/productlist')
     } else {
-      if (!product.name || product._id !== productId) {
+      if (!product.name || product._id !== productId || !product.image) {
         dispatch(listProductDetails(productId))
       } else {
         setName(product.name)
@@ -66,6 +69,34 @@ const ProductEditScreen = ({ history, match }) => {
       })
     )
   }
+   const uploadFileHandler = async (e) => {
+     const file = e.target.files[0]
+     console.log(file)
+     const formData = new FormData()
+     formData.append('file', file)
+     setUploading(true)
+
+     try {
+       const config = {
+         headers: {
+           'Content-Type': 'multipart/form-data',
+         },
+       }
+
+       const { data } = await axios.post(
+         `${process.env.REACT_APP_BACKEND_URL}/api/upload/${productId}`,
+         formData,
+         config
+       )
+       console.log(data)
+       setImage(data)
+       setUploading(false)
+     } catch (error) {
+       console.error(error)
+       setUploading(false)
+     }
+   }
+
   
 
   return (
@@ -111,11 +142,13 @@ const ProductEditScreen = ({ history, match }) => {
                 value={image}
                 onChange={(e) => setImage(e.target.value)}
               ></Form.Control>
-              <FileBase
-                type='file'
-                multiple={false}
-                onDone={({ base64 }) => setImage(base64)}
-              />
+              <Form.File
+                id='image-file'
+                label='Choose File'
+                custom
+                onChange={uploadFileHandler}
+              ></Form.File>
+              {uploading && <Loader />}
             </Form.Group>
 
             <Form.Group controlId='brand'>
