@@ -15,7 +15,7 @@
 - Admin user management
 - Admin Order details page
 - Checkout process (shipping, payment method, etc)
-- PayPal / stro[e] credit card integration
+- PayPal / stripe credit card integration
 
 ### Install Dependencies
 ```
