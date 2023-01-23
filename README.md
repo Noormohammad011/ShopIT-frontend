@@ -1,4 +1,4 @@
-# SHOP IT Backend
+# SHOP IT Frontend
 >eCommerce platform built with the MERN stack & Redux.
 
 ![Shop IT](https://raw.githubusercontent.com/Noormohammad011/react-portfolio/main/src/assets/img/projects/shopIt.png)
@@ -15,7 +15,7 @@
 - Admin user management
 - Admin Order details page
 - Checkout process (shipping, payment method, etc)
-- PayPal / credit card integration
+- PayPal / stro[e] credit card integration
 
 ### Install Dependencies
 ```
@@ -29,8 +29,6 @@ yarn i or npm i
 ```
 npm run start
 
-development 
-start:Dev
 
 ```
 ### Demo
