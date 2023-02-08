@@ -28,18 +28,24 @@ yarn i or npm i
 ### Run
 ```
 npm run start
-
-
 ```
+
+
+
 ### Demo
 Here you can see [:link:demo](https://shopit-menia.netlify.app/) [:link:backend](https://shy-cyan-squid-wear.cyclic.app/api/products)
 
 ### 🚀 About Me
 I'm a full stack developer & passionate to do my designation's responsibility and hungry to explore new technology.
 
-### Feedback
+### 🛠 Skills
+Javascript, React, Redux, Node, Express, MongoDB, Mongoose, Bootstrap, Material UI, HTML, CSS, Git, Github, Heroku, Netlify, Firebase, VS Code, Chrome Dev Tools, Postman, etc.
 
-If you have any feedback, please reach out to me at [:link:facebook](https://www.facebook.com/profile.php?id=100007513814577)
+### 📫 How to reach me:
+[![Facebook](https://img.shields.io/badge/Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white)](https://www.facebook.com/profile.php?id=100007513814577)
+[![Linkedin](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/noor-mohammad-a39415218/)
+
+
 
 
 ### Special Thanks 
