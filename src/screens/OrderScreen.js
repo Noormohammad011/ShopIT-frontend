@@ -48,6 +48,7 @@ const OrderScreen = ({ history }) => {
     if (!userInfo) {
       history.push('/login')
     }
+
     if (paymentMethod === 'PayPal') {
       const addPayPalScript = async () => {
         const { data: clientId } = await axios.get(
@@ -73,7 +74,8 @@ const OrderScreen = ({ history }) => {
           setSdkReady(true)
         }
       }
-    } else {
+    }
+    if (paymentMethod === 'Stripe') {
       if (!order || successPay || successDeliver || order._id !== id) {
         dispatch({ type: ORDER_PAY_RESET })
         dispatch({ type: ORDER_DELIVER_RESET })
@@ -234,12 +236,8 @@ const OrderScreen = ({ history }) => {
                       stripeKey={process.env.REACT_APP_STRIPE_KEY}
                       currency='USD'
                     >
-                      <Button
-                        type='button'
-                        className='btn-block'
-                        
-                      >
-                         Pay Now
+                      <Button type='button' className='btn-block'>
+                        Pay Now
                       </Button>
                     </StripeCheckout>
                   </ListGroup.Item>
