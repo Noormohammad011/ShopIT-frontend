@@ -12,7 +12,7 @@ const Footer = () => {
               width='40'
               height='40'
               className='d-inline-block mx-2 align-top rounded'
-              alt='React Bootstrap logo'
+              alt='ShopIT logo'
             />
             <span className='text-uppercase my-2'>ShopIT</span>
           </Col>

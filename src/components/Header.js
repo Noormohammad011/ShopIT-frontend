@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { LinkContainer } from 'react-router-bootstrap'
 import { logout } from '../actions/userActions'
 import SearchBox from './SearchBox'
+import { Contact } from 'lucide-react'
 const Header = () => {
   const dispatch = useDispatch()
   const userLogin = useSelector((state) => state.userLogin)
@@ -24,7 +25,7 @@ const Header = () => {
               width='30'
               height='30'
               className='d-inline-block mx-2 align-top bg-light rounded'
-              alt='React Bootstrap logo'
+              alt='ShopIT logo'
             />
             ShopIT
           </Navbar.Brand>
@@ -32,6 +33,15 @@ const Header = () => {
           <Navbar.Collapse id='basic-navbar-nav'>
             <Route render={({ history }) => <SearchBox history={history} />} />
             <Nav className='ml-auto'>
+              <LinkContainer to='/contact'>
+                <Nav.Link>
+                  <Contact
+                    className='mx-1'
+                    style={{ width: '20px', height: '20px', marginTop: '-1px' }}
+                  />
+                  Contact
+                </Nav.Link>
+              </LinkContainer>
               <LinkContainer to='/cart'>
                 <Nav.Link>
                   <i className='fas fa-shopping-cart' aria-hidden='true'></i>{' '}
