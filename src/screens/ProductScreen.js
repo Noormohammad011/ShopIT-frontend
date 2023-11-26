@@ -39,6 +39,10 @@ const ProductScreen = ({ history }) => {
       dispatch(listProductDetails(id))
       dispatch({ type: PRODUCT_CREATE_REVIEW_RESET })
     }
+    return () => {
+      dispatch(listProductDetails(id))
+      dispatch({ type: PRODUCT_CREATE_REVIEW_RESET })
+    }
   }, [dispatch, id, successProductReview, product._id])
 
   const addToCartHanler = () => {
@@ -63,8 +67,8 @@ const ProductScreen = ({ history }) => {
       ) : error ? (
         <Message variant='danger'>{error}</Message>
       ) : (
-            <>
-          <Meta title={product.name}/>
+        <>
+          <Meta title={product.name} />
           <Row>
             <Col md={6}>
               <Image src={product.image} alt={product.name} fluid />

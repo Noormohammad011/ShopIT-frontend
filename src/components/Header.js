@@ -5,7 +5,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { LinkContainer } from 'react-router-bootstrap'
 import { logout } from '../actions/userActions'
 import SearchBox from './SearchBox'
-
 const Header = () => {
   const dispatch = useDispatch()
   const userLogin = useSelector((state) => state.userLogin)
@@ -19,7 +18,16 @@ const Header = () => {
     <header>
       <Navbar bg='dark' variant='dark' expand='lg'>
         <Container>
-          <Navbar.Brand href='/'>Shop IT</Navbar.Brand>
+          <Navbar.Brand href='/'>
+            <img
+              src='/images/ecommerce.png'
+              width='30'
+              height='30'
+              className='d-inline-block mx-2 align-top bg-light rounded'
+              alt='React Bootstrap logo'
+            />
+            ShopIT
+          </Navbar.Brand>
           <Navbar.Toggle aria-controls='basic-navbar-nav' />
           <Navbar.Collapse id='basic-navbar-nav'>
             <Route render={({ history }) => <SearchBox history={history} />} />
