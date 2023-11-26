@@ -21,7 +21,6 @@ const OrderScreen = ({ history }) => {
   const [sdkReady, setSdkReady] = useState(false)
   const dispatch = useDispatch()
   const { id } = useParams()
-
   const orderDetails = useSelector((state) => state.orderDetails)
   const { order, loading, error } = orderDetails
   const cart = useSelector((state) => state.cart)
@@ -48,6 +47,9 @@ const OrderScreen = ({ history }) => {
     if (!userInfo) {
       history.push('/login')
     }
+    if (!order || order._id !== id) {
+      dispatch(getOrderDetails(id))
+    }
 
     if (paymentMethod === 'PayPal') {
       const addPayPalScript = async () => {
@@ -66,7 +68,7 @@ const OrderScreen = ({ history }) => {
       if (!order || successPay || successDeliver || order._id !== id) {
         dispatch({ type: ORDER_PAY_RESET })
         dispatch({ type: ORDER_DELIVER_RESET })
-        dispatch(getOrderDetails(id))
+        dispatch(getOrderDetails(id)) 
       } else if (!order.isPaid) {
         if (!window.paypal) {
           addPayPalScript()
@@ -102,6 +104,7 @@ const OrderScreen = ({ history }) => {
 
   const deliverHandler = () => {
     dispatch(deliverOrder(order))
+    window.location.reload()
   }
   return loading ? (
     <Loader />
