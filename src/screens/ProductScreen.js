@@ -9,8 +9,10 @@ import Meta from '../components/Meta'
 import {
   listProductDetails,
   createProductReview,
+  listRelatedProductDetails,
 } from '../actions/productActions'
 import { PRODUCT_CREATE_REVIEW_RESET } from '../constants/productConstants'
+import Product from '../components/Product'
 
 const ProductScreen = ({ history }) => {
   const [qty, setQty] = useState(1)
@@ -19,6 +21,8 @@ const ProductScreen = ({ history }) => {
   const { id } = useParams()
   const dispatch = useDispatch()
   const productDetails = useSelector((state) => state.productDetails)
+  const relatedProductDetails = useSelector((state) => state.relatedProducts)
+  const { product: relatedProducts } = relatedProductDetails
   const { loading, error, product } = productDetails
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
@@ -37,11 +41,12 @@ const ProductScreen = ({ history }) => {
     }
     if (!product._id || product._id !== id) {
       dispatch(listProductDetails(id))
+      dispatch(listRelatedProductDetails(id))
       dispatch({ type: PRODUCT_CREATE_REVIEW_RESET })
     }
     return () => {
       dispatch(listProductDetails(id))
-      dispatch({ type: PRODUCT_CREATE_REVIEW_RESET })
+      dispatch(listRelatedProductDetails(id))
     }
   }, [dispatch, id, successProductReview, product._id])
 
@@ -215,6 +220,16 @@ const ProductScreen = ({ history }) => {
           </Row>
         </>
       )}
+      <h1>Related Products</h1>
+      {relatedProducts.length === 0 && <Message>No Related Products</Message>}
+      <Row>
+        {relatedProducts.length > 0 &&
+          relatedProducts.map((product) => (
+            <Col sm={12} md={6} lg={4} key={product._id}>
+              <Product product={product} />
+            </Col>
+          ))}
+      </Row>
     </>
   )
 }
