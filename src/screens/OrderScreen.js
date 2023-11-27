@@ -17,6 +17,7 @@ import {
   ORDER_PAY_RESET,
   ORDER_DELIVER_RESET,
 } from '../constants/orderConstatns'
+import { removeFromCart } from '../actions/cartActions'
 const OrderScreen = ({ history }) => {
   const [sdkReady, setSdkReady] = useState(false)
   const dispatch = useDispatch()
@@ -97,9 +98,15 @@ const OrderScreen = ({ history }) => {
 
   const successPaymentHandler = (paymentResult) => {
     dispatch(payOrder(id, paymentResult))
+    order?.orderItems.map((item) => (
+      dispatch(removeFromCart(item.product))
+    ))
   }
   const successPaymentHandlerStripe = (token) => {
     dispatch(payOrderStripe(id, token, order.totalPrice))
+    order?.orderItems.map((item) => (
+      dispatch(removeFromCart(item.product))
+    ))
   }
 
   const deliverHandler = () => {
