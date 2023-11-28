@@ -39,14 +39,10 @@ const ProductScreen = ({ history }) => {
       setRating(0)
       setComment('')
     }
-    if (!product._id || product._id !== id) {
+    if (!product._id || product._id !== id || successProductReview) {
       dispatch(listProductDetails(id))
       dispatch(listRelatedProductDetails(id))
       dispatch({ type: PRODUCT_CREATE_REVIEW_RESET })
-    }
-    return () => {
-      dispatch(listProductDetails(id))
-      dispatch(listRelatedProductDetails(id))
     }
   }, [dispatch, id, successProductReview, product._id])
 
