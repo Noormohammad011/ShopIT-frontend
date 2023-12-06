@@ -2,7 +2,15 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { PayPalButton } from 'react-paypal-button-v2'
 import { Link, useParams } from 'react-router-dom'
-import { Row, Col, ListGroup, Image, Card, Button } from 'react-bootstrap'
+import {
+  Row,
+  Col,
+  ListGroup,
+  Image,
+  Card,
+  Button,
+  Alert,
+} from 'react-bootstrap'
 import { useSelector, useDispatch } from 'react-redux'
 import StripeCheckout from 'react-stripe-checkout'
 import Message from '../components/Message'
@@ -17,7 +25,7 @@ import {
   ORDER_PAY_RESET,
   ORDER_DELIVER_RESET,
 } from '../constants/orderConstatns'
-import { removeFromCart } from '../actions/cartActions'
+
 const OrderScreen = ({ history }) => {
   const [sdkReady, setSdkReady] = useState(false)
   const dispatch = useDispatch()
@@ -69,10 +77,13 @@ const OrderScreen = ({ history }) => {
       if (!order || successPay || successDeliver || order._id !== id) {
         dispatch({ type: ORDER_PAY_RESET })
         dispatch({ type: ORDER_DELIVER_RESET })
-        dispatch(getOrderDetails(id)) 
+        dispatch(getOrderDetails(id))
       } else if (!order.isPaid) {
         if (!window.paypal) {
-          addPayPalScript()
+          addPayPalScript().catch((err) => {
+            console.log(err)
+            window.location.reload()
+          })
         } else {
           setSdkReady(true)
         }
@@ -98,15 +109,9 @@ const OrderScreen = ({ history }) => {
 
   const successPaymentHandler = (paymentResult) => {
     dispatch(payOrder(id, paymentResult))
-    order?.orderItems.map((item) => (
-      dispatch(removeFromCart(item.product))
-    ))
   }
   const successPaymentHandlerStripe = (token) => {
     dispatch(payOrderStripe(id, token, order.totalPrice))
-    order?.orderItems.map((item) => (
-      dispatch(removeFromCart(item.product))
-    ))
   }
 
   const deliverHandler = () => {
@@ -139,11 +144,11 @@ const OrderScreen = ({ history }) => {
                 {order.shippingAddress.country}
               </p>
               {order.isDelivered ? (
-                <Message variant='success'>
+                <Alert variant='success'>
                   Delivered on {order.deliveredAt}
-                </Message>
+                </Alert>
               ) : (
-                <Message variant='danger'>Not Delivered</Message>
+                <Alert variant='danger'>Not Delivered</Alert>
               )}
             </ListGroup.Item>
 
@@ -154,9 +159,9 @@ const OrderScreen = ({ history }) => {
                 {order.paymentMethod}
               </p>
               {order.isPaid ? (
-                <Message variant='success'>Paid on {order.paidAt}</Message>
+                <Alert variant='success'>Paid on {order.paidAt}</Alert>
               ) : (
-                <Message variant='danger'>Not Paid</Message>
+                <Alert variant='danger'>Not Paid</Alert>
               )}
             </ListGroup.Item>
 
