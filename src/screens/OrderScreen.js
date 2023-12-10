@@ -25,6 +25,7 @@ import {
   ORDER_PAY_RESET,
   ORDER_DELIVER_RESET,
 } from '../constants/orderConstatns'
+import { removeFromCart } from '../actions/cartActions'
 
 const OrderScreen = ({ history }) => {
   const [sdkReady, setSdkReady] = useState(false)
@@ -33,6 +34,7 @@ const OrderScreen = ({ history }) => {
   const orderDetails = useSelector((state) => state.orderDetails)
   const { order, loading, error } = orderDetails
   const cart = useSelector((state) => state.cart)
+  const { cartItems } = cart
   const { paymentMethod } = cart
   const orderPay = useSelector((state) => state.orderPay)
   const { loading: loadingPay, success: successPay } = orderPay
@@ -40,13 +42,10 @@ const OrderScreen = ({ history }) => {
   const { loading: loadingDeliver, success: successDeliver } = orderDeliver
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
-
   if (!loading) {
-    //   Calculate prices
     const addDecimals = (num) => {
       return (Math.round(num * 100) / 100).toFixed(2)
     }
-
     order.itemsPrice = addDecimals(
       order.orderItems.reduce((acc, item) => acc + item.price * item.qty, 0)
     )
@@ -56,62 +55,39 @@ const OrderScreen = ({ history }) => {
     if (!userInfo) {
       history.push('/login')
     }
-    if (!order || order._id !== id) {
-      dispatch(getOrderDetails(id))
+
+    const addPayPalScript = async () => {
+      const { data: clientId } = await axios.get('/api/config/paypal')
+      const script = document.createElement('script')
+      script.type = 'text/javascript'
+      script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`
+      script.async = true
+      script.onload = () => {
+        setSdkReady(true)
+      }
+      document.body.appendChild(script)
     }
 
-    if (paymentMethod === 'PayPal') {
-      const addPayPalScript = async () => {
-        const { data: clientId } = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/config/paypal`
-        )
-        const script = document.createElement('script')
-        script.type = 'text/javascript'
-        script.src = `https://www.paypal.com/sdk/js?client-id=${clientId}`
-        script.async = true
-        script.onload = () => {
-          setSdkReady(true)
-        }
-        document.body.appendChild(script)
-      }
-      if (!order || successPay || successDeliver || order._id !== id) {
-        dispatch({ type: ORDER_PAY_RESET })
-        dispatch({ type: ORDER_DELIVER_RESET })
-        dispatch(getOrderDetails(id))
-      } else if (!order.isPaid) {
-        if (!window.paypal) {
-          addPayPalScript().catch((err) => {
-            console.log(err)
-            window.location.reload()
-          })
-        } else {
-          setSdkReady(true)
-        }
+    if (!order || successPay || successDeliver || order._id !== id) {
+      dispatch({ type: ORDER_PAY_RESET })
+      dispatch({ type: ORDER_DELIVER_RESET })
+      dispatch(getOrderDetails(id))
+    } else if (!order.isPaid) {
+      if (!window.paypal) {
+        addPayPalScript()
+      } else {
+        setSdkReady(true)
       }
     }
-    if (paymentMethod === 'Stripe') {
-      if (!order || successPay || successDeliver || order._id !== id) {
-        dispatch({ type: ORDER_PAY_RESET })
-        dispatch({ type: ORDER_DELIVER_RESET })
-        dispatch(getOrderDetails(id))
-      }
-    }
-  }, [
-    dispatch,
-    id,
-    successPay,
-    successDeliver,
-    order,
-    userInfo,
-    history,
-    paymentMethod,
-  ])
+  }, [dispatch, id, successPay, successDeliver, order, history, userInfo])
 
   const successPaymentHandler = (paymentResult) => {
     dispatch(payOrder(id, paymentResult))
+    cartItems?.map((item) => dispatch(removeFromCart(item.product)))
   }
   const successPaymentHandlerStripe = (token) => {
     dispatch(payOrderStripe(id, token, order.totalPrice))
+    cartItems?.map((item) => dispatch(removeFromCart(item.product)))
   }
 
   const deliverHandler = () => {
@@ -229,7 +205,8 @@ const OrderScreen = ({ history }) => {
                 </Row>
               </ListGroup.Item>
               {!order.isPaid &&
-                (paymentMethod === 'PayPal' ? (
+                (paymentMethod === 'PayPal' ||
+                order.paymentMethod === 'PayPal' ? (
                   <ListGroup.Item>
                     {loadingPay && <Loader />}
                     {!sdkReady ? (
