@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Col, Form, Row } from 'react-bootstrap'
+import { Button, Col, Form, Row, Image } from 'react-bootstrap'
 import FormContainer from '../components/FormContainer'
 import { Link } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { login } from '../actions/userActions'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
-
+import axios from 'axios'
+import { useGoogleLogin } from '@react-oauth/google'
 const LoginScreen = ({ location, history }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -26,6 +27,30 @@ const LoginScreen = ({ location, history }) => {
     e.preventDefault()
     dispatch(login(email, password))
   }
+  const loginWithGoogle = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_BACKEND_URL}/api/users/google-login`,
+          {
+            idToken: tokenResponse.access_token,
+          }
+        )
+        if (response && response.data) {
+          localStorage.setItem('userInfo', JSON.stringify(response.data))
+          window.location.reload()
+        } else {
+          <Message variant='danger'>Invalid response from server</Message>
+        }
+      } catch (error) {
+        console.error('Error during Google login:', error)
+      }
+    },
+    onError: (error) => {
+      console.error('Error during Google login:', error)
+    },
+  })
+
   return (
     <FormContainer>
       <h1>Sign In</h1>
@@ -53,17 +78,30 @@ const LoginScreen = ({ location, history }) => {
         <Button variant='primary' type='submit'>
           Sign In
         </Button>
-        <Row className='py-3'>
-          <Col>
-            New Customer ?{' '}
-            <Link
-              to={redirect ? `/register?redirect=${redirect}` : '/register'}
-            >
-              Register
-            </Link>
-          </Col>
-        </Row>
       </Form>
+      <div className='content'>
+        <p className='or'>or</p>
+      </div>
+      <Button
+        onClick={() => loginWithGoogle()}
+        variant='danger'
+        type='submit'
+        style={{ width: '100%' }}
+      >
+        <Image
+          style={{ width: '20px', height: '20px' }}
+          src='/images/google.png'
+          rounded
+        />
+      </Button>
+      <Row className='py-3'>
+        <Col>
+          New Customer ?{' '}
+          <Link to={redirect ? `/register?redirect=${redirect}` : '/register'}>
+            Register
+          </Link>
+        </Col>
+      </Row>
     </FormContainer>
   )
 }
