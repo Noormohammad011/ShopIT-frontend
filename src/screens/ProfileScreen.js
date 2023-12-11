@@ -22,7 +22,7 @@ const ProfileScreen = ({ history, location }) => {
   const userLogin = useSelector((state) => state.userLogin)
   const { userInfo } = userLogin
   const userUpdateProfile = useSelector((state) => state.userUpdateProfile)
-  const { success } = userUpdateProfile
+  const { success, userInfo: updatatedData } = userUpdateProfile
   const orderMyList = useSelector((state) => state.orderMyList)
   const { loading: loadingOrders, error: errorOrders, orders } = orderMyList
   useEffect(() => {
@@ -33,11 +33,11 @@ const ProfileScreen = ({ history, location }) => {
         dispatch(getUserDetails('profile'))
         dispatch(myListOrder())
       } else {
-        setName(user.name)
-        setEmail(user.email)
+        setName(updatatedData?.name || user.name)
+        setEmail(updatatedData?.email || user.email )
       }
     }
-  }, [history, userInfo, dispatch, user])
+  }, [history, userInfo, dispatch, user, updatatedData])
 
   const submitHandler = (e) => {
     e.preventDefault()

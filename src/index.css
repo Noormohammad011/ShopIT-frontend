@@ -69,3 +69,22 @@ h2 {
   background-size: 40% 1px;
   background-repeat: no-repeat;
 }
+@media only screen and (max-width: 600px) {
+  .content {
+    width: 100%;
+  }
+}
+/* Small devices (portrait tablets and large phones, 600px and up) */
+@media only screen and (min-width: 600px) {
+  .content {
+    width: 100%;
+  }
+}
+
+/* Medium devices (landscape tablets, 768px and up) */
+@media only screen and (min-width: 768px) {
+  .content {
+    width: 100%;
+  }
+}
+

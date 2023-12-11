@@ -11,6 +11,8 @@ import { useGoogleLogin } from '@react-oauth/google'
 const LoginScreen = ({ location, history }) => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [gloading, setGLoading] = useState(false)
+  const [gerror, setGError] = useState('')
   const redirect = location.search ? location.search.split('=')[1] : '/'
 
   const dispatch = useDispatch()
@@ -30,6 +32,7 @@ const LoginScreen = ({ location, history }) => {
   const loginWithGoogle = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
+        setGLoading(true) // Set loading state to true
         const response = await axios.post(
           `${process.env.REACT_APP_BACKEND_URL}/api/users/google-login`,
           {
@@ -40,14 +43,16 @@ const LoginScreen = ({ location, history }) => {
           localStorage.setItem('userInfo', JSON.stringify(response.data))
           window.location.reload()
         } else {
-          <Message variant='danger'>Invalid response from server</Message>
+          setGError('Invalid response from server')
         }
       } catch (error) {
-        console.error('Error during Google login:', error)
+        setGError('Error during Google login')
+      } finally {
+        setGLoading(false)
       }
     },
     onError: (error) => {
-      console.error('Error during Google login:', error)
+      setGError('Error during Google login')
     },
   })
 
@@ -56,6 +61,8 @@ const LoginScreen = ({ location, history }) => {
       <h1>Sign In</h1>
       {error && <Message variant='danger'>{error}</Message>}
       {loading && <Loader />}
+      {gloading && <Loader />}
+      {gerror && <Message variant='danger'>{gerror}</Message>}
       <Form onSubmit={submitHanler}>
         <Form.Group controlId='email'>
           <Form.Label>Email Address</Form.Label>
